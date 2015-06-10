@@ -6,8 +6,8 @@ top = Tk()
 
   
 l = Label(top, text="labeltext")
-B1 = Button(top,text="say hello",command = hello)
+B1 = Button(top,text="say hello",command = hello, cursor="plus")
 l.pack()
-B1.pack()
+B1.pack(side = BOTTOM)
 
 top.mainloop()
