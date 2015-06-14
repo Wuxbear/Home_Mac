@@ -87,6 +87,7 @@ class ORZ_GUI_DEV_SN_INPUT:
     def __init__(self, master):
         self.master = master
         self.frame = Frame(self.master)
+        #self.frame.pack_forget()
         self.dev_data = StringVar()
         self.fake_device_info = {"SN":'', "HW":'', "SW":''}
         self.l1 = Label(self.frame, text = " SN: ", relief=RIDGE)
@@ -121,7 +122,39 @@ class ORZ_GUI_DEV_SN_INPUT:
             self.dc += 1
         if self.dc == len(self.fake_device_info):
             print("all data has value, quit this window!")
+            self.frame.pack_forget()
+            self.fake_list = ["item1", "item2", "item3"]
+            self.test = ORZ_GUI_DEV_RUN_TEST_PACKAGE(self.master, self.fake_list)
 
+class ORZ_GUI_DEV_RUN_TEST_PACKAGE:
+    def __init__(self, master, item_list):
+        self.master = master
+        self.list_frame = Frame(self.master)
+        #self.fake_list = ["item1", "item2", "item3"]
+        for x in item_list:
+            l = Label(self.list_frame, text = x, relief=RIDGE)
+            l.pack()
+        self.stop = Button(self.list_frame, text = "Stop", command = self.stop_test)
+        self.stop.pack()
+        self.list_frame.pack()
+        self.console_frame = Frame(self.master)
+        self.scrollbar = Scrollbar(self.console_frame)
+        self.scrollbar.pack(side = RIGHT, fill = Y)
+        self.text = Text(self.console_frame, height=20, width = 50)
+
+        self.text.pack(side = LEFT, fill = BOTH)
+        self.scrollbar.config(command = self.text.yview)
+        #text.insert(END, data)
+        self.b = Button(self.console_frame, text='test',command = self.wt)
+        self.b.pack()
+        self.console_frame.pack()
+
+    def wt(self):
+        self.text.insert(END, "button\n")
+
+    def stop_test(self):
+        print("stop test")
+ 
 def main():
     root = Tk()
     root.title("ORZ_QS_TOOL")
