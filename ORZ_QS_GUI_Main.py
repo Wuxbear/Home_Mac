@@ -4,6 +4,7 @@ class ORZ_GUI:
     fake_test_items = ["item1", "item2", "item3", "item4"]
     Global_Data = {"IP":"192.168.1.1", "SW_version":"0001"}
     Device_SN = {"SN":"", "HW":"", "SW":""}
+    Console_Setup_Parameter = {"BaudRate":9600, "StopBit":1}
     Test_Package = {"Max_devices":2, "Test_Items":fake_test_items, "Device_SN":Device_SN}
     # test package path, Service Process PID, systme setting
     # Device_data = 
