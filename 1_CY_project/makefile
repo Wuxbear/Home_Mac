@@ -21,6 +21,9 @@ NET_LIB_OBJ=  $(NET_LIB_SRC:%.c=%.o)
 
 all: daemon
 
+test: test.c
+	gcc -o test test.c
+
 daemon: $(DAEMON_OBJ)
 	@echo "build daemon"
 	$(CC) $(CFLAGS) $(INC) $(LIB) -o $@ $(DAEMON_OBJ)
