@@ -10,6 +10,12 @@
 #include "include/uart_lib.h"
 #include "include/net_lib.h"
 
+enum DAEMON_ACTION {
+    DAEMON_START = 0x0,
+    DAEMON_STOP,
+    DAEMON_RESTART,
+};
+
 void usage(void)
 { 
     printf("\n\
@@ -48,11 +54,12 @@ static void skeleton_daemon()
 
     pid = fork();
 
-    if (pid < 0)
+    if (pid < 0) {
         exit(EXIT_FAILURE);
-
-    if (pid > 0)
+    }
+    else if (pid > 0) {
         exit(EXIT_SUCCESS);
+    }
 
     umask(0);
 
@@ -65,25 +72,19 @@ static void skeleton_daemon()
     }
 }
 
-void daemon_control(char *action)
+void daemon_control(enum DAEMON_ACTION d_act)
 {
-    if ( 0 == strcmp(action,"start")) {
-        printf("%s\n", action);
-        //skeleton_daemon();
-    }
-    else if ( 0 == strcmp(action,"stop")) {
-        printf("%s\n", action);
-        /* kill daemon*/
-        //system(kill -9 `pidof daemon`)
-        exit(EXIT_SUCCESS);
-    }
-    else if ( 0 == strcmp(action,"restart")) {
-        printf("%s\n", action);
-        /* kill and restart daemon*/
-    }
-    else {
-        printf("-a %s: Not support this action!\n", action);
-        exit(EXIT_FAILURE);
+    switch (d_act) {
+        case DAEMON_START:
+            skeleton_daemon();
+            break;
+        case DAEMON_STOP:
+            // kill -9 `pidof daemon`
+            break;
+        case DAEMON_RESTART:
+            // kill -9 `pidof daemon`
+            skeleton_daemon();
+            break;
     }
 }
 
@@ -100,6 +101,7 @@ int main(int argc, char ** argv)
          * 7. suport debug test command 
          */
     int ch;
+    enum DAEMON_ACTION d_act;
     if (argc < 4) {
         printf("try \'%s -h\' for usage.\n", argv[0]);
     }
@@ -109,24 +111,27 @@ int main(int argc, char ** argv)
         switch(ch)
         {
             case 'a':
-                daemon_control(optarg);
-                break;
-        }
-
-    }
-    
-    optind = 1;
-    while((ch = getopt(argc, argv, "a:c:s:h")) != -1)
-    {
-        switch(ch)
-        {
-            case 'a':
+                if ( 0 == strcmp(action,"start")) {
+                    d_act = DAEMON_START;
+                }
+                else if ( 0 == strcmp(action,"stop")) {
+                    d_act = DAEMON_START;
+                }
+                else if ( 0 == strcmp(action,"restart")) {
+                    d_act = DAEMON_START;
+                }
+                else {
+                    printf("None support command!n");
+                    return 1;
+                }
                 break;
             case 'c':
                 printf("c option!: %d, %s\n", optind, optarg);
+                // load the file name: config_file
                 break;
             case 's':
                 printf("s option!: %d, %s\n", optind, optarg);
+                // ??
                 break;
             case 'h':
             default:
@@ -135,10 +140,16 @@ int main(int argc, char ** argv)
 
     }
 
+    // handle the daemon
+    daemon_control(d_act);
+
+    // load config file
+    // call paser
+    // daemon loop
     openlog ("daemon", LOG_PID, LOG_DAEMON);
+    syslog(LOG_NOTICE, "daemon started.");
     while(1)
     {
-        syslog(LOG_NOTICE, "daemon started.");
         sleep(30);
         break; 
     }
