@@ -2,7 +2,11 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 
+#define DAEMON_IP  "127.0.0.1"
+#define DAEMON_LISTEN_PORT  8888
+#define DAEMON_BUFFER_SIZE  2048 
 
 int main(int argc, char ** argv)
 {
@@ -14,9 +18,9 @@ int main(int argc, char ** argv)
         puts("socket create fail!");
     }
     
-    server.sin_addr.s_addr = inet_addr("127.0.0.1");
     server.sin_family = AF_INET;
-    server.sin_port = htons(8888);
+    server.sin_addr.s_addr = inet_addr(DAEMON_IP);
+    server.sin_port = htons(DAEMON_LISTEN_PORT);
 
     if (connect(sock, (struct sockaddr *)&server, sizeof(server)) < 0) {
         perror("connect fail!");

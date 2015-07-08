@@ -6,15 +6,82 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <syslog.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 
 #include "include/uart_lib.h"
 #include "include/net_lib.h"
+
+#define DAEMON_IP  "127.0.0.1"
+#define DAEMON_LISTEN_PORT  8888
+#define DAEMON_BUFFER_SIZE  2048 
+
+volatile sig_atomic_t daemon_going = 1;
 
 enum DAEMON_ACTION {
     DAEMON_START = 0x0,
     DAEMON_STOP,
     DAEMON_RESTART,
 };
+
+void daemon_terminate_handler(int signum);
+
+void daemon_terminate_handler(int signum)
+{
+    daemon_going = 0;
+    //signal(signum, daemon_terminate_handler);
+    //stop thread or release resource before kill daemon
+}
+
+int daemon_loop(void)
+{
+    int server_socket, client_socket, c, read_size;
+    struct sockaddr_in server_sockaddr, client_sockaddr;
+    char client_message[DAEMON_BUFFER_SIZE];
+    
+    if (signal(SIGTERM, daemon_terminate_handler) == SIG_IGN) {
+        signal(SIGTERM, SIG_IGN);
+    }
+    signal(SIGINT, SIG_IGN);
+    signal(SIGHUP, SIG_IGN);
+
+    server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_socket == -1) {
+        printf("could not create socket!");
+        return 1;
+    }
+    
+    bzero(&server_sockaddr, sizeof(server_sockaddr));
+    server_sockaddr.sin_family = AF_INET;
+    server_sockaddr.sin_addr.s_addr = inet_addr(DAEMON_IP);
+    server_sockaddr.sin_port = htons(DAEMON_LISTEN_PORT);
+
+    if(bind(server_socket,(struct sockaddr *)&server_sockaddr, sizeof(server_sockaddr)) < 0) {
+        perror("bind fail!");
+        return 1;
+    }
+
+    if (listen(server_socket, 5) == -1) {
+        perror("listen fail!");
+        return 1;
+    }
+
+    while (daemon_going) {
+        c = sizeof(struct sockaddr_in);
+        client_socket = accept(server_socket, (struct sockaddr *)&client_sockaddr, (socklen_t *) &c);
+        if (client_socket < 0) {
+            perror("accept fail!");
+            return 1;
+        }
+        
+        while ((read_size = recv(client_socket, client_message, 2000, 0)) > 0) {
+            write(client_socket, client_message, strlen(client_message));    
+        }
+    } 
+ 
+    close(server_socket);
+    return 0;
+}
 
 void usage(void)
 { 
@@ -47,12 +114,6 @@ static void skeleton_daemon()
     /* On success: The child process becomes session leader */
     if (setsid() < 0)
         exit(EXIT_FAILURE);
-
-    //Signal handle
-    signal(SIGCHLD, SIG_IGN);
-    signal(SIGHUP, SIG_IGN);
-    //Whe it get the kill signal, release resource and close thread ,process.
-
 
     pid = fork();
 
@@ -104,8 +165,9 @@ int main(int argc, char ** argv)
          */
     int ch;
     enum DAEMON_ACTION d_act;
-    if (argc < 4) {
-        printf("try \'%s -h\' for usage.\n", argv[0]);
+
+    if (argc < 5) {
+        usage();
     }
 
     while((ch = getopt(argc, argv, "a:c:s:h")) != -1)
@@ -149,16 +211,17 @@ int main(int argc, char ** argv)
     // call paser
     // daemon loop
     openlog ("daemon", LOG_PID, LOG_DAEMON);
-    syslog(LOG_NOTICE, "daemon started.");
-    while(1)
-    {
-        sleep(30);
-        break; 
+    syslog(LOG_NOTICE, "daemon start.");
+
+    if (daemon_loop()) {
+        syslog(LOG_NOTICE, "daemon loop fail.");
+        closelog();
+        return EXIT_FAILURE;
     }
-    syslog(LOG_NOTICE, "daemon terminated.");
-    closelog();
-    return EXIT_SUCCESS;
-
+    else {
+        syslog(LOG_NOTICE, "daemon terminated.");
+        closelog();
+        return EXIT_SUCCESS;
+    }
 }
-
 
