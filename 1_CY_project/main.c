@@ -48,8 +48,10 @@ static void skeleton_daemon()
     if (setsid() < 0)
         exit(EXIT_FAILURE);
 
+    //Signal handle
     signal(SIGCHLD, SIG_IGN);
     signal(SIGHUP, SIG_IGN);
+    //Whe it get the kill signal, release resource and close thread ,process.
 
 
     pid = fork();
@@ -111,13 +113,13 @@ int main(int argc, char ** argv)
         switch(ch)
         {
             case 'a':
-                if ( 0 == strcmp(action,"start")) {
+                if ( 0 == strcmp(optarg,"start")) {
                     d_act = DAEMON_START;
                 }
-                else if ( 0 == strcmp(action,"stop")) {
+                else if ( 0 == strcmp(optarg,"stop")) {
                     d_act = DAEMON_START;
                 }
-                else if ( 0 == strcmp(action,"restart")) {
+                else if ( 0 == strcmp(optarg,"restart")) {
                     d_act = DAEMON_START;
                 }
                 else {

@@ -3,6 +3,7 @@ CC ?= gcc
 CFLAGS ?= -Wall
 INC ?= -I include
 LIB ?= 
+DYNAMIC_LIB_FLAGS ?= -fPIC -s shared
 
 # static lib, -static
 # share lib, -shared
@@ -30,6 +31,7 @@ daemon: $(DAEMON_OBJ)
 
 uart_lib.so:
 	@echo "build uart_lib"
+	# $(CC) $(CFLAGS) $(DYNAMIC_LIBS_FLAG) -o $@ $(DAEMON_OBJ)
 
 net_lib.so:
 	@echo "build net_lib"
