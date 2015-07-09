@@ -12,6 +12,7 @@
 #include "include/uart_lib.h"
 #include "include/net_lib.h"
 
+#define DAEMON_NAME  "daemon"
 #define DAEMON_IP  "127.0.0.1"
 #define DAEMON_LISTEN_PORT  8888
 #define DAEMON_BUFFER_SIZE  2048 
@@ -73,6 +74,8 @@ int daemon_loop(void)
             perror("accept fail!");
             return 1;
         }
+        
+        //command parser, switch case
         
         while ((read_size = recv(client_socket, client_message, 2000, 0)) > 0) {
             write(client_socket, client_message, strlen(client_message));    
@@ -204,13 +207,14 @@ int main(int argc, char ** argv)
 
     }
 
-    // handle the daemon
+    // handle the daemon on/off
     daemon_control(d_act);
 
     // load config file
-    // call paser
+
+    // initial function pointer
     // daemon loop
-    openlog ("daemon", LOG_PID, LOG_DAEMON);
+    openlog(DAEMON_NAME, LOG_PID, LOG_DAEMON);
     syslog(LOG_NOTICE, "daemon start.");
 
     if (daemon_loop()) {

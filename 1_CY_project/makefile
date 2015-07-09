@@ -2,7 +2,7 @@
 CC ?= gcc
 CFLAGS ?= -Wall
 INC ?= -I include
-LIB ?= 
+LIB ?= -rdynamic -ldl
 DYNAMIC_LIB_FLAGS ?= -fPIC -s shared
 
 # static lib, -static
