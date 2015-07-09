@@ -17,6 +17,8 @@
 #define DAEMON_LISTEN_PORT  8888
 #define DAEMON_BUFFER_SIZE  2048 
 
+#define UART_LIB_NAME "uart_lib.so"
+
 volatile sig_atomic_t daemon_going = 1;
 
 enum DAEMON_ACTION {
@@ -25,7 +27,29 @@ enum DAEMON_ACTION {
     DAEMON_RESTART,
 };
 
-void daemon_terminate_handler(int signum);
+int load_dynamic_lib(void)
+{
+    void *lib_p;
+    void (*fp)(void);
+    char *errmsg;
+
+    lib_p = dlopen(UART_LIB_NAME, RTLD_NOW);
+    if (!lib_p) {
+        fprintf(stderr, "%s\n", dlerror());
+        exit(1);
+    }
+    //clear err msg buf
+    dlerror();
+    fp = dlsym(handle, "fp");
+    if ((errmsg = dlerror()) != NULL) {
+        fprintf(stderr, "%s\n", dlerror());
+        exit(1);
+    }
+
+    (*fp)();
+    dlclose(handle);
+}
+
 
 void daemon_terminate_handler(int signum)
 {
