@@ -1,5 +1,7 @@
 #include "include/cmd.h"
 
+int (*fp[])(void *data);
+
 
 void cmd_paser(struct ooxx *p)
 {

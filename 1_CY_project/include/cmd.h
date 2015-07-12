@@ -37,6 +37,7 @@
 #define CMD_MCU_SELF_TEST   0xE0
 #define CMD_OLED_SELF_TEST  0xE1
 
+typedef int (*fp_t)(void *data);
 
 #endif
 

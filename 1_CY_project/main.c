@@ -8,9 +8,11 @@
 #include <syslog.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <dlfcn.h>
 
 #include "include/uart_lib.h"
 #include "include/net_lib.h"
+#include "include/cmd.h"
 
 #define DAEMON_NAME  "daemon"
 #define DAEMON_IP  "127.0.0.1"
@@ -30,30 +32,33 @@ enum DAEMON_ACTION {
 int load_dynamic_lib(void)
 {
     void *lib_p;
-    void (*fp)(void);
+    //int (*fp)(void *);
+    fp_t fp;
     char *errmsg;
 
     lib_p = dlopen(UART_LIB_NAME, RTLD_NOW);
     if (!lib_p) {
         fprintf(stderr, "%s\n", dlerror());
-        exit(1);
+        return 1;
     }
     //clear err msg buf
     dlerror();
-    fp = dlsym(handle, "fp");
+    fp = dlsym(lib_p, "fp");
     if ((errmsg = dlerror()) != NULL) {
         fprintf(stderr, "%s\n", dlerror());
-        exit(1);
+        return 1;
     }
 
-    (*fp)();
-    dlclose(handle);
+    (*fp)(errmsg);
+    dlclose(lib_p);
+    return 0;
 }
 
 
 void daemon_terminate_handler(int signum)
 {
     daemon_going = 0;
+    printf("kill daemon!\n");
     //signal(signum, daemon_terminate_handler);
     //stop thread or release resource before kill daemon
 }
@@ -64,8 +69,8 @@ int daemon_loop(void)
     struct sockaddr_in server_sockaddr, client_sockaddr;
     char client_message[DAEMON_BUFFER_SIZE];
     
-    if (signal(SIGTERM, daemon_terminate_handler) == SIG_IGN) {
-        signal(SIGTERM, SIG_IGN);
+    if (signal(SIGKILL, daemon_terminate_handler) == SIG_IGN) {
+        signal(SIGKILL, SIG_IGN);
     }
     signal(SIGINT, SIG_IGN);
     signal(SIGHUP, SIG_IGN);
@@ -237,6 +242,8 @@ int main(int argc, char ** argv)
     // load config file
 
     // initial function pointer
+    load_dynamic_lib();
+
     // daemon loop
     openlog(DAEMON_NAME, LOG_PID, LOG_DAEMON);
     syslog(LOG_NOTICE, "daemon start.");

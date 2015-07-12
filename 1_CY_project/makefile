@@ -1,5 +1,10 @@
 
-CC ?= gcc
+ifndef CROSS_COMPILE
+	CC ?= gcc
+else
+	CC ?= gcc-cross-ooxx
+endif
+
 CFLAGS ?= -Wall
 INC ?= -I include
 LIB ?= -ldl
