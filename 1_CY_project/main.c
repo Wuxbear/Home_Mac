@@ -2,12 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <signal.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <syslog.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
 #include <dlfcn.h>
 
 #include "include/uart_lib.h"
@@ -29,6 +26,7 @@ enum DAEMON_ACTION {
     DAEMON_RESTART,
 };
 
+/*
 int load_dynamic_lib(void)
 {
     void *lib_p;
@@ -53,7 +51,7 @@ int load_dynamic_lib(void)
     dlclose(lib_p);
     return 0;
 }
-
+*/
 
 void daemon_terminate_handler(int signum)
 {
@@ -200,6 +198,7 @@ int main(int argc, char ** argv)
 
     if (argc < 5) {
         usage();
+        return 1;
     }
 
     while((ch = getopt(argc, argv, "a:c:s:h")) != -1)
@@ -232,6 +231,7 @@ int main(int argc, char ** argv)
             case 'h':
             default:
                 usage();
+                return 1;
         }
 
     }
@@ -242,7 +242,7 @@ int main(int argc, char ** argv)
     // load config file
 
     // initial function pointer
-    load_dynamic_lib();
+    //load_dynamic_lib();
 
     // daemon loop
     openlog(DAEMON_NAME, LOG_PID, LOG_DAEMON);

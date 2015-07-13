@@ -37,7 +37,52 @@
 #define CMD_MCU_SELF_TEST   0xE0
 #define CMD_OLED_SELF_TEST  0xE1
 
+//basic function pointer type
 typedef int (*fp_t)(void *data);
+
+enum DAEMON_CMD_ID {
+	CMD_POWER_OFF = 0x00,
+	CMD_POWER_ON_TIME = 0x01,
+	CMD_POWER_ON_ALARM = 0x02,
+	CMD_POWER_OFF_TIME = 0x03,
+	CMD_MCU_RESET = 0x04,
+
+	CMD_MCU_SET_DATA_ADDR = 0x10,
+	CMD_MCU_SET_EXT_MENU = 0x11,
+
+	CMD_MCU_SPI_FLASH_ERASE = 0x20,
+	CMD_MCU_SPI_FLASH_WRITE = 0x21,
+	CMD_DATA_CHECK = 0x22,
+
+	CMD_OLED_CLEAN = 0x30,
+	CMD_OLED_TEXT_OUT = 0x31,
+	CMD_OLED_IMAGE_OUT = 0x32,
+	CMD_OLED_RESET = 0x32,
+
+	CMD_RTC_SETUP = 0x40,
+
+	CMD_GPIO_DIRECTION_SETUP = 0x50,
+	CMD_GPIO_VALUE_SETUP = 0x51,
+
+	CMD_MCU_XPORT = 0x60,
+
+	CMD_I2C_MASTER_SEND = 0x70,
+
+	CMD_MCU_STATUS_CHANGE = 0xC0,
+	CMD_MCU_EXT_MENU = 0xC1,
+	CMD_BOOT_ARGUMENT = 0xC2,
+
+	CMD_MCU_SELF_TEST = 0xE0,
+	CMD_OLED_SELF_TEST = 0xE1,
+
+};
+
+struct cmd_meta_data {
+    enum DAEMON_CMD_ID cmd_id;
+    unsigned int length;
+    char data[0];
+};
+
 
 #endif
 
