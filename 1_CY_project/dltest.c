@@ -5,7 +5,7 @@
 int main(int argc, char **argv)
 {
     void *handle;
-    void (*fp)(void);
+    int (*fp)(void *dd);
     char *errmsg;
 
     handle = dlopen("libx.so", RTLD_LAZY);
@@ -22,7 +22,7 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    (*fp)();
+    (*fp)(errmsg);
     dlclose(handle);
     return 0;
 }

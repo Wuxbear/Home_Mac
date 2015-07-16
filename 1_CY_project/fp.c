@@ -1,8 +1,8 @@
 #include <stdio.h>
 
-
-void fp(void)
+int fp(void *data)
 {
     printf("fp!\n");
+    return 0;
 }
 
