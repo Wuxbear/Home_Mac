@@ -6,6 +6,9 @@
 #include <sys/stat.h>
 #include <syslog.h>
 #include <dlfcn.h>
+#include <signal.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 
 #include "include/uart_lib.h"
 #include "include/net_lib.h"
@@ -25,6 +28,17 @@ enum DAEMON_ACTION {
     DAEMON_STOP,
     DAEMON_RESTART,
 };
+
+
+/* Default plugins path 
+ * /var/share/eis/plugins
+ *
+ * Customer plugins path
+ * ~/eis/plugins
+ *
+ * configuration file path
+ * /etc/eis/eis.conf
+ */
 
 /*
 int load_dynamic_lib(void)
