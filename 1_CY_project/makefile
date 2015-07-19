@@ -5,44 +5,49 @@ else
 	CC ?= gcc-cross-ooxx
 endif
 
-CFLAGS ?= -Wall
+CFLAGS ?=
 INC ?= -I include
 LIB ?= -ldl
 
 STATIC_LIB_FLAGS ?= -static
+SHARED_LIB_FLAGS ?= -shared
 DYNAMIC_LIB_FLAGS ?= -fPIC -shared
 
-DAEMON_SRC = main.c
-DAEMON_OBJ = $(DAEMON_SRC:%.c=%.o)
-UART_LIB_SRC = uart_lib.c
-UART_LIB_OBJ = $(UART_LIB_SRC:%.c=%.o)
-NET_LIB_SRC = net_lib.c
-NET_LIB_OBJ=  $(NET_LIB_SRC:%.c=%.o)
+EIS_DAEMON_SRC = $(wildcard eis-daemon/*.c)
+EIS_DAEMON_OBJ = $(patsubst %.c,%.o,$(wildcard eis-daemon/*.c))
+
+EIS_LIBS_SRC = $(wildcard eis-libs/*.c)
+EIS_LIBS_OBJ = $(patsubst %.c,%.o,$(wildcard eis-libs/*.c))
+
+EIS_PLUGINS_SRC = $(wildcard eis-plugins/*.c)
+EIS_PLUGINS_OBJ = $(patsubst %.c,%.o,$(wildcard eis-plugins/*.c))
 
 .SUFFIXES:
 .SUFFIXES: .c .o
-.PHONY: clean
+.PHONY: clean install
 
-all: daemon
+all : eis_lib.so eis_plugin.so eis_daemon
 
-test: test.c
-	gcc -o test test.c
-
-daemon: $(DAEMON_OBJ)
+eis_daemon: $(EIS_DAEMON_OBJ)
 	@echo "build daemon"
-	$(CC) $(CFLAGS) $(INC) $(LIB) -o $@ $(DAEMON_OBJ)
+	#$(CC) $(CFLAGS) -c $(EIS_DAEMON_OBJ)
+	$(CC) $(CFLAGS) $(INC) $(LIB) -o $@ $(EIS_DAEMON_OBJ)
 
-uart_lib.so: $(UART_LIB_OBJ)
-	@echo "build uart_lib.so"
-	$(CC) $(CFLAGS) $(DYNAMIC_LIB_FLAGS) -o $@ $(UART_LIB_OBJ)
+eis_lib.so: $(EIS_LIBS_OBJ)
+	@echo "build eis_lib.so"
+	$(CC) $(CFLAGS) $(DYNAMIC_LIB_FLAGS) -o $@ $<
 
-net_lib.so: $(NET_LIB_OBJ)
-	@echo "build net_lib.so"
-	$(CC) $(CFLAGS) $(DYNAMIC_LIB_FLAGS) -o $@ $(NET_LIB_OBJ)
+eis_plugin.so: $(EIS_PLUGINS_OBJ)
+	@echo "build eis_plugin.so"
+	$(CC) $(CFLAGS) $(DYNAMIC_LIB_FLAGS) -o $@ $<
 
-%.o: %.c
-	$(CC) $(CFLAGS) -c $<
+%.o : %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+install:
+	@echo "copy lib and daemon to rootfs folder."
 
 clean:
-	-rm -f daemon uart_lib.so *.o
+	-rm -f eis-daemon/*.o eis-libs/*.o eis-plugins/*.o
+	-rm -f eis_daemon eis_lib.so eis_plugin.so
 

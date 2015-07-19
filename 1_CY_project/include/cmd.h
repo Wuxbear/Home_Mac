@@ -19,7 +19,7 @@
 #define CMD_OLED_CLEAN  0x30
 #define CMD_OLED_TEXT_OUT   0x31
 #define CMD_OLED_IMAGE_OUT  0x32
-#define CMD_OLED_RESET  0x32
+#define CMD_OLED_RESET  0x33
 
 #define CMD_RTC_SETUP   0x40
 
@@ -39,7 +39,7 @@
 
 //basic function pointer type
 typedef int (*fp_t)(void *data);
-
+/*
 enum DAEMON_CMD_ID {
 	CMD_ID_POWER_OFF = 0x00,
 	CMD_ID_POWER_ON_TIME = 0x01,
@@ -76,9 +76,10 @@ enum DAEMON_CMD_ID {
 	CMD_ID_OLED_SELF_TEST = 0xE1,
 
 };
-
+*/
 struct cmd_meta_data {
-    enum DAEMON_CMD_ID cmd_id;
+    //enum DAEMON_CMD_ID cmd_id;
+    unsigned int cmd_id;
     unsigned int length;
     char data[0];
 };

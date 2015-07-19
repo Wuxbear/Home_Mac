@@ -10,9 +10,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-#include "include/uart_lib.h"
-#include "include/net_lib.h"
-#include "include/cmd.h"
+#include "../include/cmd.h"
 
 #define DAEMON_NAME  "daemon"
 #define DAEMON_IP  "127.0.0.1"

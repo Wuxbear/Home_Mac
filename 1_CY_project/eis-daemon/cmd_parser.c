@@ -1,10 +1,10 @@
 
 #include <stdio.h>
 
-#include "include/cmd.h"
-#include "include/daemon.h"
+#include "../include/cmd.h"
+#include "../include/daemon.h"
 
-int (*fp[])(void *data);
+//typedef int (*fp[])(void *data);
 
 int cmd_paser(struct cmd_meta_data *p)
 {
@@ -84,6 +84,8 @@ int cmd_paser(struct cmd_meta_data *p)
             break;
         default:
             //!! fail
+            printf("!!\n");
+            break;
     }
     //fp = dlsymbol(ooxx)
     //return (*fp)(ooxx->data);

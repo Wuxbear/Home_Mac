@@ -1,5 +1,5 @@
 #include <sys/ioctl.h>
-#include <linux/usbdevice_fs.h>
+//#include <linux/usbdevice_fs.h>
 #include <stdio.h>
 #include <termios.h>
 #include <fcntl.h>
@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 #include "uart.h"
-#include "debug.h"
+#include "../include/debug.h"
 
 
 void con_close(int fd,struct termios *info)
@@ -207,7 +207,7 @@ void reset_usb(int fd, char *device)
 
     _DEBUG_MSG("Resetting USB device %s\n", device);
 
-    rc = ioctl(fd, USBDEVFS_RESET, 0);
+    //rc = ioctl(fd, USBDEVFS_RESET, 0);
     if (rc < 0) { 
         _DEBUG_MSG("Error in ioctl\n");
     }

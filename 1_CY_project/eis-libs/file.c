@@ -9,7 +9,7 @@
 #include <fcntl.h>
 
 #include "file.h"
-#include "debug.h"
+#include "../include/debug.h"
 
 #define LOG_FILE "log.txt"
 #define LOG_PATH "/var/log"

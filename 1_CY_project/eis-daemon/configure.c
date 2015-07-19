@@ -7,7 +7,7 @@
 
 #include "configure.h"
 
-static struct conf {
+struct conf {
     char name[128];
     char data[128];
     struct conf *next;
@@ -27,14 +27,32 @@ char * get_conf(char *str)
     while(now != NULL)
     {
         if(!strcmp(now->name,str)){
-            return &now->data;
+            return now->data;
         }
         now = now->next;
     }
     return NULL;
 }
 
-void configure_init(char * file)
+void cfg_list(void)
+{
+    struct conf *now = NULL;
+
+    if (list == NULL) {
+        printf("No data!");
+        return;
+    }
+
+    now = list;
+
+    while(now != NULL)
+    {
+        printf("%s : %s\n", now->name, now->data);
+        now = now->next;
+    }
+}
+
+int configure_init(char * file)
 {
     FILE *fp = NULL;
     struct conf *new = NULL;
@@ -50,10 +68,10 @@ void configure_init(char * file)
     {
 #ifdef DEBUG
         printf("Can't load configure[ %s ]\n",file);
+        return 1;
 #endif
     }
 
-    
     while (fgets(buff, sizeof(buff),fp) != NULL){
 
         if(!strncmp(buff,"#",1) || strlen(buff) == strcspn(buff,"="))
@@ -77,4 +95,18 @@ void configure_init(char * file)
         
     }
     fclose(fp);
+    return 0;
 }
+
+int self_test(void)
+{
+    char test_cfg[] = "eis.cfg";
+    char * name = NULL;
+    configure_init(test_cfg);
+    name = get_conf("name");
+    printf("name %s\n", name);
+    cfg_list();
+    free(list);
+    return 0;
+}
+
